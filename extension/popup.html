@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireAssist</title>
+    <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="../public/icon48.png" alt="HireAssist" class="logo">
+            <h1>HireAssist</h1>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="profile">Profile</button>
+            <button class="tab-button" data-tab="settings">Settings</button>
+            <button class="tab-button" data-tab="actions">Actions</button>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content active">
+            <h3>Personal Information</h3>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="full-name">Full Name:</label>
+                    <input type="text" id="full-name" name="fullName" placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="john@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+                </div>
+                
+                <div class="form-group">
+                    <label for="linkedin">LinkedIn URL:</label>
+                    <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/johndoe">
+                </div>
+                
+                <div class="form-group">
+                    <label for="resume-file">Upload Resume:</label>
+                    <input type="file" id="resume-file" accept=".pdf,.doc,.docx,.txt">
+                    <div id="resume-status"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </form>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content">
+            <h3>API Configuration</h3>
+            <form id="settings-form">
+                <div class="form-group">
+                    <label for="backend-url">Backend URL:</label>
+                    <input type="url" id="backend-url" name="backendUrl" value="http://localhost:3000" placeholder="http://localhost:3000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="auto-fill">
+                        <input type="checkbox" id="auto-fill" name="autoFill">
+                        Enable Auto-fill
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="smart-suggestions">
+                        <input type="checkbox" id="smart-suggestions" name="smartSuggestions">
+                        Enable Smart Suggestions
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+            </form>
+        </div>
+
+        <!-- Actions Tab -->
+        <div id="actions-tab" class="tab-content">
+            <h3>Quick Actions</h3>
+            
+            <div class="action-group">
+                <button id="parse-job-description" class="btn btn-secondary">
+                    Parse Job Description
+                </button>
+                <p class="action-description">Extract job requirements from current page</p>
+            </div>
+            
+            <div class="action-group">
+                <button id="optimize-resume" class="btn btn-secondary">
+                    Optimize Resume
+                </button>
+                <p class="action-description">Tailor resume for this job posting</p>
+            </div>
+            
+            <div class="action-group">
+                <button id="generate-cover-letter" class="btn btn-secondary">
+                    Generate Cover Letter
+                </button>
+                <p class="action-description">Create personalized cover letter</p>
+            </div>
+            
+            <div class="action-group">
+                <button id="fill-application" class="btn btn-secondary">
+                    Auto-fill Application
+                </button>
+                <p class="action-description">Fill form with your information</p>
+            </div>
+        </div>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
