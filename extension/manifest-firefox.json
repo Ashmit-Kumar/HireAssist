@@ -1,0 +1,68 @@
+{
+  "manifest_version": 2,
+  "name": "HireAssist",
+  "version": "1.0.0",
+  "description": "AI-powered job application assistant for resume optimization and auto-fill",
+  
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "http://localhost:3000/*",
+    "https://*.linkedin.com/*",
+    "https://*.indeed.com/*",
+    "https://*.glassdoor.com/*",
+    "https://*.workday.com/*",
+    "https://*.greenhouse.io/*",
+    "https://*.lever.co/*"
+  ],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "HireAssist",
+    "default_icon": {
+      "16": "public/icon16.png",
+      "48": "public/icon48.png",
+      "128": "public/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "public/icon16.png",
+    "48": "public/icon48.png",
+    "128": "public/icon128.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://*.glassdoor.com/*",
+        "https://*.workday.com/*",
+        "https://*.greenhouse.io/*",
+        "https://*.lever.co/*"
+      ],
+      "js": [
+        "content/jd_parser.js",
+        "content/question_detector.js",
+        "content/autofill.js"
+      ],
+      "css": ["styles/popup.css"]
+    }
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "web_accessible_resources": ["public/*"],
+
+  "applications": {
+    "gecko": {
+      "id": "hireassist@example.com",
+      "strict_min_version": "57.0"
+    }
+  }
+}
