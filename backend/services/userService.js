@@ -13,7 +13,7 @@ const logger = require('../utils/logger');
  * Ye function naya user register karta hai system me
  * Approach: Generate secure ID + create user object + store with encryption
  */
-async function registerUser(requestData = {}) {
+async function registerUser(profileData = {}, settingsData = {}, requestData = {}) {
   try {
     logger.info('🔄 Starting user registration process...');
     
@@ -25,6 +25,28 @@ async function registerUser(requestData = {}) {
     // Registration ke baad immediate login ke liye session token banata hai
     const sessionToken = generateSessionToken(userId);
     
+    // Encrypt sensitive profile data
+    // Profile data ko encrypt karta hai
+    const encryptedProfile = {};
+    if (profileData && Object.keys(profileData).length > 0) {
+      Object.keys(profileData).forEach(key => {
+        // Encrypt sensitive fields like email, phone, etc.
+        // Email, phone jaise sensitive fields ko encrypt karta hai
+        if (['email', 'phone', 'fullName'].includes(key)) {
+          encryptedProfile[key] = encryptSensitiveData(profileData[key]);
+        } else {
+          encryptedProfile[key] = profileData[key];
+        }
+      });
+    }
+    
+    // Merge settings with defaults
+    // Settings ko defaults ke saath merge karta hai
+    const userSettings = {
+      ...getDefaultUserSettings(),
+      ...settingsData
+    };
+    
     // Create user data object
     // User ka data object create karta hai
     const userData = {
@@ -32,9 +54,9 @@ async function registerUser(requestData = {}) {
       createdAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
-      profile: {}, // Empty profile initially
+      profile: encryptedProfile,
       resumes: [],
-      settings: getDefaultUserSettings(),
+      settings: userSettings,
       metadata: {
         registrationIP: requestData.ip || 'unknown',
         userAgent: requestData.userAgent || 'unknown',
@@ -69,6 +91,7 @@ async function registerUser(requestData = {}) {
       success: true,
       userId: userId,
       sessionToken: sessionToken,
+      profile: decryptUserSensitiveData({ profile: encryptedProfile }).profile,
       expiresIn: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
       message: 'User registered successfully'
     };
