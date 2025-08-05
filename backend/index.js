@@ -1,30 +1,116 @@
 const express = require('express');
-const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
+
+// Import configurations
+const { setupSecurity } = require('./config/security');
+const { setupDatabase } = require('./config/database');
+const logger = require('./utils/logger');
+
+// Import routes
+const healthRoutes = require('./routes/health');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/**
+ * Main server initialization function
+ * Ye function server ko setup karta hai step by step
+ * Approach: Security first, then routes, then error handling
+ */
+async function initializeServer() {
+  try {
+    logger.info('🚀 Starting HireAssist Secure Backend...');
 
-// Routes
-app.use('/api/user', require('./routes/user'));
-app.use('/api/resume', require('./routes/resume'));
-app.use('/api/cover-letter', require('./routes/coverLetter'));
-app.use('/api/optimize', require('./routes/optimize'));
-app.use('/api/answer', require('./routes/answer'));
+    // Step 1: Setup security middleware (helmet, cors, rate limiting)
+    // Ye security headers aur protection lagata hai
+    setupSecurity(app);
+    logger.info('✅ Security middleware configured');
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'HireAssist Backend is running' });
-});
+    // Step 2: Setup database/storage
+    // Ye data storage initialize karta hai (in-memory for now)
+    await setupDatabase();
+    logger.info('✅ Database/Storage initialized');
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    // Step 3: Setup routes
+    // Ye API endpoints define karta hai
+    app.use('/health', healthRoutes);
+    logger.info('✅ Routes configured');
+
+    // Step 4: Error handling
+    // Ye global error handling setup karta hai
+    setupErrorHandling(app);
+    logger.info('✅ Error handling configured');
+
+    // Step 5: Start server
+    // Server ko start karta hai aur success message show karta hai
+    const server = app.listen(PORT, () => {
+      logger.info(`✅ Server running on port ${PORT}`);
+      logger.info(`🔗 Health check: http://localhost:${PORT}/health`);
+      logger.info(`🛡️ Security: Enabled`);
+    });
+
+    // Graceful shutdown setup
+    // Server ko safely band karne ke liye
+    setupGracefulShutdown(server);
+
+  } catch (error) {
+    logger.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+/**
+ * Global error handling setup
+ * Ye function server-wide error handling setup karta hai
+ * Approach: 404 handler first, then global error handler
+ */
+function setupErrorHandling(app) {
+  // 404 handler - jab koi endpoint nahi milta
+  app.use('*', (req, res) => {
+    res.status(404).json({
+      error: 'Endpoint not found',
+      message: `${req.method} ${req.originalUrl} is not valid`,
+      availableEndpoints: ['/health']
+    });
+  });
+
+  // Global error handler - sabhi errors ko handle karta hai
+  app.use((err, req, res, next) => {
+    logger.error(`Error ${req.id}:`, err);
+    
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    res.status(err.status || 500).json({
+      error: 'Internal server error',
+      message: isDevelopment ? err.message : 'Something went wrong',
+      requestId: req.id
+    });
+  });
+}
+
+/**
+ * Graceful shutdown setup
+ * Server ko safely shutdown karne ke liye
+ * Approach: SIGTERM signal catch karke server close karta hai
+ */
+function setupGracefulShutdown(server) {
+  process.on('SIGTERM', () => {
+    logger.info('� SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      logger.info('✅ Process terminated');
+    });
+  });
+
+  process.on('SIGINT', () => {
+    logger.info('🛑 SIGINT received, shutting down gracefully');
+    server.close(() => {
+      logger.info('✅ Process terminated');
+    });
+  });
+}
+
+// Start the server
+// Ye main entry point hai
+initializeServer();
 
 module.exports = app;
