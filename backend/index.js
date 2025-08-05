@@ -8,6 +8,7 @@ const logger = require('./utils/logger');
 
 // Import routes
 const healthRoutes = require('./routes/health');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ async function initializeServer() {
     // Step 3: Setup routes
     // Ye API endpoints define karta hai
     app.use('/health', healthRoutes);
+    app.use('/api/users', userRoutes);
     logger.info('✅ Routes configured');
 
     // Step 4: Error handling
@@ -46,7 +48,8 @@ async function initializeServer() {
     const server = app.listen(PORT, () => {
       logger.info(`✅ Server running on port ${PORT}`);
       logger.info(`🔗 Health check: http://localhost:${PORT}/health`);
-      logger.info(`🛡️ Security: Enabled`);
+      logger.info(`� User API: http://localhost:${PORT}/api/users`);
+      logger.info(`�🛡️ Security: Enabled`);
     });
 
     // Graceful shutdown setup
@@ -70,7 +73,7 @@ function setupErrorHandling(app) {
     res.status(404).json({
       error: 'Endpoint not found',
       message: `${req.method} ${req.originalUrl} is not valid`,
-      availableEndpoints: ['/health']
+      availableEndpoints: ['/health', '/api/users']
     });
   });
 
