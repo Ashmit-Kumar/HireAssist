@@ -2,7 +2,7 @@
 
 An AI-powered browser extension that automates and enhances job applications with intelligent resume optimization, cover letter generation, and application form auto-filling.
 
-## 🚀 Features are here 
+## 🚀 Features 
 
 - **Smart Auto-Fill**: Automatically detect and fill job application forms
 - **Resume Optimization**: AI-powered resume tailoring for specific job postings
